@@ -14,13 +14,15 @@
     </form>
   {% endcomment %}
 
-  <ul class="list-news">
-
-    {% for object in latest %}
-      {% include 'blog/news_summary.html' with object=object %}
-    {% endfor %}
-
-  </ul>
+  {% if latest %}
+    <ul class="list-news">
+      {% for object in latest %}
+        {% include 'blog/news_summary.html' with object=object %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No entries available yet.</p>
+  {% endif %}
 
   {% include 'blog/blog_pagination.html' %}
 

@@ -33,7 +33,11 @@ class BlogViewMixin:
 
 
 class BlogArchiveIndexView(BlogViewMixin, ArchiveIndexView):
-    pass
+    def get(self, request, *args, **kwargs):
+        if not self.get_queryset().exists():
+            context = self.get_context_data(object_list=[])
+            return self.render_to_response(context)
+        return super().get(request, *args, **kwargs)
 
 
 class BlogYearArchiveView(BlogViewMixin, YearArchiveView):
