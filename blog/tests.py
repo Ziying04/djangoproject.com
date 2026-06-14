@@ -8,6 +8,8 @@ from django.contrib import admin
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -35,6 +37,20 @@ class DateTimeMixin:
 
 
 class EntryTestCase(DateTimeMixin, TestCase):
+    def test_blog_pagination_renders_accessible_markup(self):
+        paginator = Paginator(range(30), 10)
+        page_obj = paginator.page(1)
+
+        rendered = render_to_string(
+            "blog/blog_pagination.html",
+            {"is_paginated": True, "page_obj": page_obj},
+        )
+
+        self.assertIn('<nav class="pagination"', rendered)
+        self.assertIn('<ol class="nav-pagination">', rendered)
+        self.assertIn('aria-current="page"', rendered)
+        self.assertIn('aria-label="Next page"', rendered)
+
     def test_manager_active(self):
         """
         Make sure that the Entry manager's `active` method works
