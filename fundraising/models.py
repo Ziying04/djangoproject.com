@@ -57,20 +57,24 @@ class FundraisingModel(models.Model):
             self.id = get_fundraising_id()
         return super().save(*args, **kwargs)
 
-
 class DjangoHero(LogoThumbnailMixin, FundraisingModel):
     email = models.EmailField(blank=True)
-    # TODO: Make this unique.
     stripe_customer_id = models.CharField(max_length=100, blank=True)
     logo = ImageField(upload_to="fundraising/logos/", blank=True)
     url = models.URLField(blank=True, verbose_name="URL")
     name = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=255, blank=True)
+
     HERO_TYPE_CHOICES = (
         ("individual", _("Individual")),
         ("organization", _("Organization")),
     )
-    hero_type = models.CharField(max_length=30, choices=HERO_TYPE_CHOICES, blank=True)
+
+    hero_type = models.CharField(
+        max_length=30,
+        choices=HERO_TYPE_CHOICES,
+        blank=True,
+    )
     is_visible = models.BooleanField(
         default=False,
         verbose_name=_("Agreed to displaying on the fundraising page?"),
@@ -92,6 +96,13 @@ class DjangoHero(LogoThumbnailMixin, FundraisingModel):
     class Meta:
         verbose_name = _("Django hero")
         verbose_name_plural = _("Django heroes")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["stripe_customer_id"],
+                condition=~models.Q(stripe_customer_id=""),
+                name="unique_nonblank_djangohero_stripe_customer_id",
+            ),
+        ]
 
     @property
     def display_name(self):
@@ -100,6 +111,7 @@ class DjangoHero(LogoThumbnailMixin, FundraisingModel):
     @property
     def name_with_fallback(self):
         return self.name if self.name else _("Anonymous Hero")
+
 
 
 class Donation(FundraisingModel):
