@@ -1,4 +1,28 @@
+from django.core.exceptions import ImproperlyConfigured
+
 from .common import *  # noqa
+
+_REQUIRED_SECRET_KEYS = {
+    "secret_key",
+    "superfeedr_creds",
+    "stripe_secret_key",
+    "stripe_publishable_key",
+    "stripe_endpoint_secret",
+    "stripe_product_id_monthly",
+    "stripe_product_id_quarterly",
+    "stripe_product_id_yearly",
+    "stripe_product_id_onetime",
+}
+
+_missing_secret_keys = sorted(
+    key for key in _REQUIRED_SECRET_KEYS if not SECRETS.get(key)
+)
+
+if _missing_secret_keys:
+    missing_keys = ", ".join(_missing_secret_keys)
+    raise ImproperlyConfigured(
+        f"Missing required production secrets: {missing_keys}"
+    )
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "djangoproject.com")
 

@@ -16,6 +16,63 @@ LOCALE_MIDDLEWARE_EXCLUDED_HOSTS = ["docs.djangoproject.localhost"]
 DEBUG = True
 THUMBNAIL_DEBUG = DEBUG
 
+# Local development placeholders only.
+SECRET_KEY = str(
+    SECRETS.get("secret_key") or "development-only-secret-key"
+)
+
+SUPERFEEDR_CREDS = SECRETS.get(
+    "superfeedr_creds",
+    ["developer@example.invalid", "development-placeholder"],
+)
+
+STRIPE_SECRET_KEY = SECRETS.get(
+    "stripe_secret_key",
+    "sk_test_development_placeholder",
+)
+STRIPE_PUBLISHABLE_KEY = SECRETS.get(
+    "stripe_publishable_key",
+    "pk_test_development_placeholder",
+)
+STRIPE_ENDPOINT_SECRET = SECRETS.get(
+    "stripe_endpoint_secret",
+    "development-webhook-placeholder",
+)
+
+PRODUCTS = {
+    "monthly": {
+        "product_id": SECRETS.get(
+            "stripe_product_id_monthly",
+            "development_monthly_product",
+        ),
+        "interval": "month",
+        "interval_count": 1,
+    },
+    "quarterly": {
+        "product_id": SECRETS.get(
+            "stripe_product_id_quarterly",
+            "development_quarterly_product",
+        ),
+        "interval": "month",
+        "interval_count": 3,
+    },
+    "yearly": {
+        "product_id": SECRETS.get(
+            "stripe_product_id_yearly",
+            "development_yearly_product",
+        ),
+        "interval": "year",
+        "interval_count": 1,
+    },
+    "onetime": {
+        "product_id": SECRETS.get(
+            "stripe_product_id_onetime",
+            "development_onetime_product",
+        ),
+        "recurring": False,
+    },
+}
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
