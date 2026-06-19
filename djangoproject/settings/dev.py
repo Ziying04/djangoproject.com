@@ -7,6 +7,10 @@ ALLOWED_HOSTS = [
     "dashboard.djangoproject.localhost",
 ] + SECRETS.get("allowed_hosts", [])
 
+CORS_ALLOWED_ORIGINS = {
+    "http://docs.djangoproject.localhost:8000",
+}
+
 LOCALE_MIDDLEWARE_EXCLUDED_HOSTS = ["docs.djangoproject.localhost"]
 
 DEBUG = True

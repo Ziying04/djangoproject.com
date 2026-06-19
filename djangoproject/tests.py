@@ -3,12 +3,14 @@ from io import StringIO
 
 from django.conf import settings
 from django.core.management import call_command
-from django.test import TestCase
+from django.http import HttpResponse
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import NoReverseMatch, get_resolver
 from django.utils.translation import activate, gettext as _
 from django_hosts.resolvers import reverse
 
 from docs.models import DocumentRelease, Release
+from djangoproject.middleware import CORSMiddleware
 
 
 class ReleaseMixin:
@@ -92,6 +94,52 @@ class TemplateViewTests(ReleaseMixin, TestCase):
 
     def test_styleguide(self):
         self.assertView("styleguide")
+
+class CORSMiddlewareTests(SimpleTestCase):
+    """Tests for the development CORS origin allowlist."""
+
+    allowed_origin = "http://docs.djangoproject.localhost:8000"
+    disallowed_origin = "https://untrusted.example.com"
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.middleware = CORSMiddleware(lambda request: HttpResponse("OK"))
+
+    def test_allowed_origin_receives_cors_header(self):
+        request = self.factory.get(
+            "/",
+            HTTP_ORIGIN=self.allowed_origin,
+        )
+
+        with self.settings(CORS_ALLOWED_ORIGINS={self.allowed_origin}):
+            response = self.middleware(request)
+
+        self.assertEqual(
+            response["Access-Control-Allow-Origin"],
+            self.allowed_origin,
+        )
+        self.assertIn("Origin", response.get("Vary", ""))
+
+    def test_disallowed_origin_receives_no_cors_header(self):
+        request = self.factory.get(
+            "/",
+            HTTP_ORIGIN=self.disallowed_origin,
+        )
+
+        with self.settings(CORS_ALLOWED_ORIGINS={self.allowed_origin}):
+            response = self.middleware(request)
+
+        self.assertNotIn("Access-Control-Allow-Origin", response)
+        self.assertNotIn("Origin", response.get("Vary", ""))
+
+    def test_missing_origin_receives_no_cors_header(self):
+        request = self.factory.get("/")
+
+        with self.settings(CORS_ALLOWED_ORIGINS={self.allowed_origin}):
+            response = self.middleware(request)
+
+        self.assertNotIn("Access-Control-Allow-Origin", response)
+        self.assertNotIn("Origin", response.get("Vary", ""))
 
 
 class ExcludeHostsLocaleMiddlewareTests(ReleaseMixin, TestCase):
