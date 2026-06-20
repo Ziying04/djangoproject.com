@@ -126,7 +126,18 @@ Install and run locally from a virtual environment
 Running the tests
 -----------------
 
+Database Prerequisites for Testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To support the database query performance optimizations (E2) implemented in the aggregator application, the test suite executes a native ANSI-SQL window function query (``ROW_NUMBER() OVER PARTITION BY``).
+
+Running the test suite locally requires a database engine with full window function support:
+
+* **PostgreSQL (v17+)**: Recommended. Ensure PostgreSQL is active and database roles are configured.
+* **SQLite (v3.25+)**: If testing with SQLite, ensure your installed SQLite library version is 3.25.0 or higher. Running tests on older versions will trigger SQL syntax exceptions.
+
 We use GitHub actions for continuous testing and
+
 `GitHub <https://github.com/>`_ pull request integration. If you're familiar
 with those systems you should not have any problems writing tests.
 
