@@ -86,6 +86,7 @@ class SearchFormTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         # No header item is active.
+        self.assertContains(response, _("No search query given"))
         self.assertNotContains(response, '<li class="active">')
         # The search result page does not have the Documentation banner.
         self.assertNotContains(response, '<div class="copy-banner">')
