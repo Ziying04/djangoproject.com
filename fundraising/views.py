@@ -60,6 +60,8 @@ def configure_checkout_session(request):
     # Form data:
     # - The interval: which determines the Product and the mode.
     # - The amount: which goes to the Price data.
+    # Validate the request before calling Stripe so the UI can report a clear
+    # error without depending on a network round-trip.
     form = PaymentForm(request.POST)
     if not form.is_valid():
         data = {"success": False, "error": form.errors}

@@ -14,3 +14,6 @@ djangoproject/static/css/*.map
 djangoproject/static/css/*.css
 # Additional ignores for Docker
 .git/
+# Local Python virtual environments
+.venv/
+venv/

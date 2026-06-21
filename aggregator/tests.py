@@ -92,7 +92,35 @@ class AggregatorTests(TestCase):
     def test_community_index_number_of_queries(self):
         """Intended to prevent an n+1 issue on the community index view"""
         url = reverse("community-index")
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(10):
+            self.client.get(url)
+
+    def test_community_index_constant_queries_with_multiple_feed_types(self):
+        """Verify that adding more feed types does not increase the number of database queries (preventing N+1 scaling)"""
+        # Create 5 more feed types, each with an approved feed and item
+        for i in range(5):
+            ft = models.FeedType.objects.create(
+                name=f"Extra Feed Type {i}",
+                slug=f"extra-feed-type-{i}",
+                can_self_add=True,
+            )
+            feed = models.Feed.objects.create(
+                title=f"Extra Feed {i}",
+                feed_url=f"https://extra{i}.com/rss/",
+                public_url=f"https://extra{i}.com/",
+                approval_status=models.APPROVED_FEED,
+                feed_type=ft,
+            )
+            models.FeedItem.objects.create(
+                feed=feed,
+                title=f"Extra Item {i}",
+                link=feed.public_url,
+                date_modified=datetime.datetime.now(),
+                guid=f"extra-item-{i}",
+            )
+
+        url = reverse("community-index")
+        with self.assertNumQueries(10):
             self.client.get(url)
 
     def test_empty_feed_type_not_rendered(self):

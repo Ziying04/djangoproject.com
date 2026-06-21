@@ -18,10 +18,7 @@ try:
     with (DATA_DIR / "conf" / "secrets.json").open() as handle:
         SECRETS = json.load(handle)
 except OSError:
-    SECRETS = {
-        "secret_key": "a",
-        "superfeedr_creds": ["any@email.com", "some_string"],
-    }
+    SECRETS = {}
 
 
 # Django settings
@@ -166,7 +163,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "djangoproject.urls.www"
 
-SECRET_KEY = str(SECRETS["secret_key"])
+SECRET_KEY = str(SECRETS.get("secret_key") or "")
 
 SECURE_BROWSER_XSS_FILTER = True
 
@@ -273,36 +270,33 @@ FASTLY_API_KEY = SECRETS.get("fastly_api_key")
 FASTLY_SERVICE_URL = SECRETS.get("fastly_service_url")
 
 # Stripe settings
+STRIPE_SECRET_KEY = SECRETS.get("stripe_secret_key")
+STRIPE_PUBLISHABLE_KEY = SECRETS.get("stripe_publishable_key")
+STRIPE_ENDPOINT_SECRET = SECRETS.get("stripe_endpoint_secret")
 
-# only testing keys as fallback values here please!
-STRIPE_SECRET_KEY = SECRETS.get("stripe_secret_key", "sk_test_x6zP4wd7Z5jcvDOJbbHZlHHt")
-STRIPE_PUBLISHABLE_KEY = SECRETS.get(
-    "stripe_publishable_key", "pk_test_TyB5jcROwK8mlCNrn3dCwW7l"
-)
-STRIPE_ENDPOINT_SECRET = SECRETS.get("stripe_endpoint_secret", "insecure")
-
-# product IDs
+# Product IDs
 PRODUCTS = {
     "monthly": {
-        "product_id": SECRETS.get("stripe_product_id_monthly", "dummy_monthly_id"),
+        "product_id": SECRETS.get("stripe_product_id_monthly"),
         "interval": "month",
         "interval_count": 1,
     },
     "quarterly": {
-        "product_id": SECRETS.get("stripe_product_id_quarterly", "dummy_quarterly_id"),
+        "product_id": SECRETS.get("stripe_product_id_quarterly"),
         "interval": "month",
         "interval_count": 3,
     },
     "yearly": {
-        "product_id": SECRETS.get("stripe_product_id_yearly", "dummy_yearly_id"),
+        "product_id": SECRETS.get("stripe_product_id_yearly"),
         "interval": "year",
         "interval_count": 1,
     },
     "onetime": {
-        "product_id": SECRETS.get("stripe_product_id_onetime", "dummy_onetime_id"),
+        "product_id": SECRETS.get("stripe_product_id_onetime"),
         "recurring": False,
     },
 }
+
 
 # sorl-thumbnail settings
 THUMBNAIL_PRESERVE_FORMAT = True

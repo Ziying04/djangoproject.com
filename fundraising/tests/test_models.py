@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 
 from ..models import DjangoHero, Donation, InKindDonor
@@ -44,6 +45,26 @@ class TestDjangoHero(TemporaryMediaRootMixin, TestCase):
     def test_display_name(self):
         hero = DjangoHero(name="Hero")
         self.assertEqual(hero.display_name, "Hero")
+
+    def test_duplicate_nonblank_stripe_customer_id_rejected(self):
+        DjangoHero.objects.create(stripe_customer_id="cus_duplicate")
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                DjangoHero.objects.create(stripe_customer_id="cus_duplicate")
+
+    def test_multiple_blank_stripe_customer_ids_allowed(self):
+        original_count = DjangoHero.objects.filter(
+            stripe_customer_id=""
+        ).count()
+
+        DjangoHero.objects.create()
+        DjangoHero.objects.create()
+
+        self.assertEqual(
+             DjangoHero.objects.filter(stripe_customer_id="").count(),
+             original_count + 2,
+    )
 
 
 class TestDonation(TestCase):
