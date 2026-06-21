@@ -1,14 +1,15 @@
 from django.conf import settings
 from django.http.request import split_domain_port
 from django.middleware.locale import LocaleMiddleware
+from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 
 
 class CORSMiddleware:
     """
-    Set the CORS 'Access-Control-Allow-Origin' header to allow the debug
-    toolbar to work on the docs domain.
+    Allow only explicitly configured development origins to access responses
+    required by the Django Debug Toolbar.
     """
 
     def __init__(self, get_response):
@@ -16,7 +17,14 @@ class CORSMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        response["Access-Control-Allow-Origin"] = "*"
+
+        origin = request.headers.get("Origin")
+        allowed_origins = getattr(settings, "CORS_ALLOWED_ORIGINS", ())
+
+        if origin and origin in allowed_origins:
+            response["Access-Control-Allow-Origin"] = origin
+            patch_vary_headers(response, ("Origin",))
+
         return response
 
 
