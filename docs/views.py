@@ -196,6 +196,8 @@ def search_results(request, lang, version, per_page=10, orphans=3):
                     % {"page_number": page_number, "message": str(e)}
                 )
 
+            # Keep the active category and search term attached to pagination
+            # links so users can navigate through results without losing context.
             context.update(
                 {
                     "query": q,
