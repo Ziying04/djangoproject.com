@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.generic.list import ListView
@@ -12,11 +13,37 @@ def index(request):
     """
     Displays the latest feeds of each type.
     """
+    feed_types = list(FeedType.objects.all())
+
+    # Get the latest 5 approved feed items for each feed type using a window query
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id FROM (
+                SELECT fi.id, ROW_NUMBER() OVER (PARTITION BY f.feed_type_id ORDER BY fi.date_modified DESC) as rn
+                FROM aggregator_feeditem fi
+                INNER JOIN aggregator_feed f ON fi.feed_id = f.id
+                WHERE f.approval_status = 'A'
+            ) WHERE rn <= 5
+        """)
+        ids = [row[0] for row in cursor.fetchall()]
+
+    recent_items = (
+        FeedItem.objects.filter(id__in=ids)
+        .select_related("feed", "feed__feed_type")
+        .order_by("-date_modified")
+    )
+
+    from collections import defaultdict
+    items_by_feedtype = defaultdict(list)
+    for item in recent_items:
+        items_by_feedtype[item.feed.feed_type_id].append(item)
+
     feeds = []
-    for ft in FeedType.objects.all():
-        recent_items = ft.items()[0:5]
-        if recent_items:
-            feeds.append((ft, recent_items))
+    for ft in feed_types:
+        items = items_by_feedtype[ft.id]
+        if items:
+            feeds.append((ft, items))
+
     ctx = {"feedtype_list": feeds}
     return render(request, "aggregator/index.html", ctx)
 
@@ -125,4 +152,5 @@ class LocalDjangoCommunitiesListView(ListView):
     template_name = "aggregator/local-django-community.html"
 
     def get_queryset(self):
-        return self.model.objects.all().order_by("continent").values()
+        return self.model.objects.all().order_by("continent")
+

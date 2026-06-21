@@ -147,27 +147,8 @@ When working on the site locally, keep the following setup details in mind:
 Running the tests
 -----------------
 
-Test documentation
-~~~~~~~~~~~~~~~~~
-
-The repository includes a few targeted test commands that are especially useful
-when verifying the recent documentation and fundraising changes:
-
-- ``python -m manage test docs.tests.test_views``
-- ``python -m manage test docs.tests.test_models``
-- ``python -m manage test fundraising.tests.test_views``
-- ``python -m manage test fundraising.tests.test_forms``
-
-If you want to run the full suite locally, use:
-
-- ``make test``
-
-You can also run a single test case or module directly with Django's test
-runner, for example:
-
-- ``python -m manage test docs.tests.test_views.SearchFormTestCase``
-
 We use GitHub actions for continuous testing and
+
 `GitHub <https://github.com/>`_ pull request integration. If you're familiar
 with those systems you should not have any problems writing tests.
 
