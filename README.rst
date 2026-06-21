@@ -126,6 +126,16 @@ Install and run locally from a virtual environment
 Local development notes for the recent enhancements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Database Prerequisites for Testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To support the database query performance optimizations (E2) implemented in the aggregator application, the test suite executes a native ANSI-SQL window function query (``ROW_NUMBER() OVER PARTITION BY``).
+
+Running the test suite locally requires a database engine with full window function support:
+
+* **PostgreSQL (v17+)**: Recommended. Ensure PostgreSQL is active and database roles are configured.
+* **SQLite (v3.25+)**: If testing with SQLite, ensure your installed SQLite library version is 3.25.0 or higher. Running tests on older versions will trigger SQL syntax exceptions.
+
 When working on the site locally, keep the following setup details in mind:
 
 - The local ``secrets.json`` file should include the Stripe placeholders used by
@@ -146,6 +156,25 @@ When working on the site locally, keep the following setup details in mind:
 
 Running the tests
 -----------------
+Test documentation
+~~~~~~~~~~~~~~~~~
+
+The repository includes a few targeted test commands that are especially useful
+when verifying the recent documentation and fundraising changes:
+
+- ``python -m manage test docs.tests.test_views``
+- ``python -m manage test docs.tests.test_models``
+- ``python -m manage test fundraising.tests.test_views``
+- ``python -m manage test fundraising.tests.test_forms``
+
+If you want to run the full suite locally, use:
+
+- ``make test``
+
+You can also run a single test case or module directly with Django's test
+runner, for example:
+
+- ``python -m manage test docs.tests.test_views.SearchFormTestCase``
 
 We use GitHub actions for continuous testing and
 
