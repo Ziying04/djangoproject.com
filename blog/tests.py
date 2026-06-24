@@ -320,6 +320,7 @@ class ViewsTestCase(ReleaseMixin, DateTimeMixin, TestCase):
         self.client.force_login(user)
         self.assertEqual(Entry.objects.all().count(), 1)
         response = self.client.get(reverse("weblog:index"))
+        print("DEBUG RESPONSE:", response.status_code, response.content)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No entries available yet.")
 

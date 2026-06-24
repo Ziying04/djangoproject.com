@@ -27,24 +27,20 @@
 
   {% if is_paginated %}
     <nav class="pagination" aria-label="{% translate "Pagination" %}">
-      <ol class="nav-pagination">
+      <div class="nav-pagination">
         {% if page_obj.has_previous %}
-          <li>
-            <a rel="prev" class="previous" href="?page={{ page_obj.previous_page_number }}" aria-label="{% translate "Previous page" context "pagination" %}">
-              <i class="icon icon-chevron-left" aria-hidden="true"></i>
-              <span class="visuallyhidden">{% translate "Previous" context "pagination" %}</span>
-            </a>
-          </li>
+          <a rel="prev" class="previous" href="?page={{ page_obj.previous_page_number }}" aria-label="{% translate "Previous page" context "pagination" %}">
+            <i class="icon icon-chevron-left" aria-hidden="true"></i>
+            <span class="visuallyhidden">{% translate "Previous" context "pagination" %}</span>
+          </a>
         {% endif %}
         {% if page_obj.has_next %}
-          <li>
-            <a rel="next" class="next" href="?page={{ page_obj.next_page_number }}" aria-label="{% translate "Next page" context "pagination" %}">
-              <i class="icon icon-chevron-right" aria-hidden="true"></i>
-              <span class="visuallyhidden">{% translate "Next" context "pagination" %}</span>
-            </a>
-          </li>
+          <a rel="next" class="next" href="?page={{ page_obj.next_page_number }}" aria-label="{% translate "Next page" context "pagination" %}">
+            <i class="icon icon-chevron-right" aria-hidden="true"></i>
+            <span class="visuallyhidden">{% translate "Next" context "pagination" %}</span>
+          </a>
         {% endif %}
-      </ol>
+      </div>
     </nav>
   {% endif %}
 

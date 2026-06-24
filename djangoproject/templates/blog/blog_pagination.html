@@ -2,28 +2,24 @@
 
 {% if is_paginated %}
   <nav class="pagination" aria-label="{% translate "Pagination" %}">
-    <ol class="nav-pagination">
+    <div class="nav-pagination">
       {% if page_obj.has_previous %}
-        <li>
-          <a rel="prev" class="previous" href="?page={{ page_obj.previous_page_number }}" aria-label="{% translate "Previous page" context "pagination" %}">
-            <i class="icon icon-chevron-left" aria-hidden="true"></i>
-            <span class="visuallyhidden">{% translate "Previous" context "pagination" %}</span>
-          </a>
-        </li>
+        <a rel="prev" class="previous" href="?page={{ page_obj.previous_page_number }}" aria-label="{% translate "Previous page" context "pagination" %}" aria-describedby="current-page-label">
+          <i class="icon icon-chevron-left" aria-hidden="true"></i>
+          <span class="visuallyhidden">{% translate "Previous" context "pagination" %}</span>
+        </a>
       {% endif %}
-      <li class="page-current" aria-current="page">
+      <span class="page-current" id="current-page-label" aria-current="page">
         {% blocktranslate trimmed with page_num=page_obj.number pages=page_obj.paginator.num_pages %}
           Page {{ page_num }} of {{ pages }}
         {% endblocktranslate %}
-      </li>
+      </span>
       {% if page_obj.has_next %}
-        <li>
-          <a rel="next" class="next" href="?page={{ page_obj.next_page_number }}" aria-label="{% translate "Next page" context "pagination" %}">
-            <i class="icon icon-chevron-right" aria-hidden="true"></i>
-            <span class="visuallyhidden">{% translate "Next" context "pagination" %}</span>
-          </a>
-        </li>
+        <a rel="next" class="next" href="?page={{ page_obj.next_page_number }}" aria-label="{% translate "Next page" context "pagination" %}" aria-describedby="current-page-label">
+          <i class="icon icon-chevron-right" aria-hidden="true"></i>
+          <span class="visuallyhidden">{% translate "Next" context "pagination" %}</span>
+        </a>
       {% endif %}
-    </ol>
+    </div>
   </nav>
 {% endif %}
